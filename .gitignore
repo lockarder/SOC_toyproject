@@ -20,3 +20,4 @@ Thumbs.db
 # 其他常见忽略
 *.swp
 *.swo
+data/raw/
