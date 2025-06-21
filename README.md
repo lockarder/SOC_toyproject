@@ -33,9 +33,24 @@ paperswithcode.com
 ![放电恢复](image/锂电池放电完成后极化电压消除，电压回升%20温度回降.png)
 
 ## __main__.py 文件架构 
-batch_convert_mat_to_csv（）实现.mat 到 .csv的转换，假如Delta time 和 SOC 的伪真值
-clean_soc_csv_file （） 清洗NAN和去掉SOC不合理的值
-plot_voltage_soc_by_cycle() 可视化观察不同工况的V I SOC with respect to time
+        Step 1: 原始数据加载
+                ↓
+        Step 2: 按文件划分训练 / 验证 / 测试
+                ↓
+        Step 3: 用训练集 fit 标准化器 StandardScaler
+                ↓
+        Step 4: 分别 transform 三个子集
+                ↓
+        Step 5: 转为 Tensor
+                ↓
+        Step 6: 封装成 Dataset（带序列窗口）
+                ↓
+        Step 7: 封装成 DataLoader（可训练）
+1. batch_convert_mat_to_csv（）实现data\raw\ .mat 到 .csv的转换，假如Delta time 和 SOC 的伪真值
+2. clean_soc_csv_file （） 清洗NAN和去掉SOC不合理的值 得到data\procssed\ **soc_clean.csv
+3. plot_voltage_soc_by_cycle() 可视化观察不同工况的 [V I SOC] with respect to time 
+4. df = load_all_clean_csvs(processed_dir) 拼接文件 B0005,6,7 _soc_clean.csv
+5. 
 
 
 

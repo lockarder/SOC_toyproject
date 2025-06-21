@@ -46,3 +46,47 @@ def clean_soc_csv_files(input_dir, output_dir=None, soc_min=0.0, soc_max=1.0):
             # 保存
             df_clean.to_csv(output_path, index=False)
             print(f"📁 保存到: {output_path}\n")
+
+
+import os
+import pandas as pd
+
+def load_all_clean_csvs(processed_dir, selected_features=None):
+    """
+    加载指定目录下所有 *_soc_clean.csv 文件，提取指定特征列（含 Cycle_Index），合并成一个 DataFrame。
+
+    参数：
+        processed_dir (str): 清洗后 CSV 文件的路径，如 data/processed
+        selected_features (list[str] or None): 需要提取的特征列（默认提取 ['Delta_t', 'Voltage', 'Current', 'Temperature', 'SOC']）
+
+    返回：
+        pd.DataFrame: 合并后的清洗数据，附带 SourceFile 和 Cycle_Index 列
+    """
+    if selected_features is None:
+        selected_features = ['Delta_t', 'Voltage', 'Current', 'Temperature', 'SOC']
+
+    # 确保 Cycle_Index 一定保留
+    if 'Cycle_Index' not in selected_features:
+        selected_features = selected_features + ['Cycle_Index']
+
+    all_frames = []
+
+    for filename in os.listdir(processed_dir):
+        if filename.endswith('_soc_clean.csv'):
+            file_path = os.path.join(processed_dir, filename)
+            df = pd.read_csv(file_path)
+
+            # 检查列完整性
+            missing_cols = [col for col in selected_features if col not in df.columns]
+            if missing_cols:
+                raise ValueError(f"⚠️ 文件 {filename} 缺失列: {missing_cols}")
+            
+            df = df[selected_features].copy()
+            df['SourceFile'] = filename
+            all_frames.append(df)
+
+    if not all_frames:
+        raise FileNotFoundError(f"❌ 未找到任何 '_soc_clean.csv' 文件于目录: {processed_dir}")
+    
+    combined_df = pd.concat(all_frames, ignore_index=True)
+    return combined_df
