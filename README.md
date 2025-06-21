@@ -1,5 +1,5 @@
 # SOC_toyproject
-
+Author: Shiang Guo
 ## 项目简介
 这是一个电池状态（SOC）估计的深度学习示范项目，包含数据处理、模型训练和评估代码。
 
@@ -24,7 +24,18 @@ nasa.gov
 paperswithcode.com
 +2
 
+典型的充放电曲线：
+1. S型放电：
+![放电](image/放电.png)
+2. CC-CV充电
+![充电](image/CCCV充电.png)
+3. 锂电池放电完成后极化电压消除，电压回升 温度回降
+![放电恢复](image/锂电池放电完成后极化电压消除，电压回升%20温度回降.png)
+
+
 ## 环境依赖
 请使用以下命令安装依赖：
 ```bash
 pip install -r requirements.txt
+
+

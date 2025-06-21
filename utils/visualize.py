@@ -2,6 +2,7 @@ import scipy.io
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 def visualize_battery_cycle(data_folder, mat_filename, cycle_index, visualize=True):
     mat_path = os.path.join(data_folder, mat_filename)
@@ -38,8 +39,10 @@ def visualize_battery_cycle(data_folder, mat_filename, cycle_index, visualize=Tr
 
     # 读取 data
     data = cycle['data']
-    data = data[0, 0] if len(data.shape) > 1 else data[0]
 
+    data = data[0, 0] if len(data.shape) > 1 else data[0]
+    print(f"Cycle {cycle_index} data time 内容:", data['time'].flatten())
+    
     # 提取6个字段
     V = data['Voltage_measured'].flatten()
     I = data['Current_measured'].flatten()
@@ -74,3 +77,45 @@ def visualize_battery_cycle(data_folder, mat_filename, cycle_index, visualize=Tr
         plt.show()
     print(data['Time'].flatten())
     return total_cycles
+
+
+def plot_voltage_soc_by_cycle(csv_path):
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    df = pd.read_csv(csv_path)
+    df = df.dropna(subset=['Cycle_Index', 'Cycle_Type', 'Cycle_Relative_Time', 'Voltage', 'SOC'])
+    df['Cycle_Index'] = df['Cycle_Index'].astype(int)
+
+    fig1, axs1 = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    fig1.suptitle('Voltage vs Relative Time')
+
+    fig2, axs2 = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    fig2.suptitle('SOC vs Relative Time')
+
+    cycle_types = ['charge', 'discharge']
+
+    for i, cycle_type in enumerate(cycle_types):
+        subset = df[df['Cycle_Type'] == cycle_type]
+        if subset.empty:
+            print(f"⚠️ No data for {cycle_type} cycles, skip plotting.")
+            continue
+
+        ax_v = axs1[i]
+        ax_s = axs2[i]
+
+        for cycle_idx, group in subset.groupby('Cycle_Index'):
+            ax_v.plot(group['Cycle_Relative_Time'], group['Voltage'], alpha=0.7)
+            ax_s.plot(group['Cycle_Relative_Time'], group['SOC'], alpha=0.7)
+
+        ax_v.set_title(f'{cycle_type.capitalize()} Cycles')
+        ax_v.set_ylabel('Voltage (V)')
+        ax_v.grid(True)
+
+        ax_s.set_title(f'{cycle_type.capitalize()} Cycles')
+        ax_s.set_xlabel('Relative Time (s)')
+        ax_s.set_ylabel('SOC')
+        ax_s.grid(True)
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.show()
