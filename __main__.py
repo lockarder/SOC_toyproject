@@ -4,6 +4,8 @@ import pandas as pd
 from utils import plot_voltage_soc_by_cycle
 from utils import parse_mat_to_df
 from utils import batch_convert_mat_to_csv
+from utils import clean_soc_csv_files
+
 mat_dir = r"data/raw/batterydata"
 csv_dir = r"data/processed"
 
@@ -21,7 +23,8 @@ print(df.columns.tolist())
 print(df.head())
 #获得SOC-LAbel的索引 B0007_soc.csv
 
-plot_voltage_soc_by_cycle(r"data/processed/B0007_soc.csv")
+#plot_voltage_soc_by_cycle(r"data/processed/B0007_soc.csv")
+clean_soc_csv_files("data/processed")
 
 
 
