@@ -1,71 +1,76 @@
 import scipy.io
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 
 def visualize_battery_cycle(data_folder, mat_filename, cycle_index, visualize=True):
-    """
-    加载指定 .mat 文件，打印 cycle 数量和指定 cycle 的部分信息，
-    并可视化该 cycle 的 data 字段随时间变化图。
-
-    参数:
-    - data_folder: str, 数据所在文件夹路径
-    - mat_filename: str, .mat 文件名
-    - cycle_index: int, 要查看的 cycle 索引（从0开始）
-    - visualize: bool, 是否绘图，默认 True
-
-    返回:
-    - total_cycles: int, 该文件中 cycle 总数量
-    """
     mat_path = os.path.join(data_folder, mat_filename)
     mat_data = scipy.io.loadmat(mat_path)
 
-    var_name = os.path.splitext(mat_filename)[0]
-    battery_data = mat_data.get(var_name)
+    battery_data = mat_data.get(os.path.splitext(mat_filename)[0])
     if battery_data is None:
-        raise ValueError(f"未找到对应变量 {var_name} 在 {mat_filename} 中")
+        raise ValueError(f"未找到对应变量 {os.path.splitext(mat_filename)[0]} 在 {mat_filename} 中")
 
     battery_struct = battery_data[0, 0]
     cycles = battery_struct['cycle']
-
-    # 支持多维或单维cycle结构
     total_cycles = cycles.shape[1] if len(cycles.shape) > 1 else cycles.shape[0]
+
     print(f"总循环次数: {total_cycles}")
 
-    # 获取指定cycle，兼容单维和二维情况
     if total_cycles == 1:
         cycle = cycles[0]
     else:
         cycle = cycles[0, cycle_index] if len(cycles.shape) > 1 else cycles[cycle_index]
 
     print(f"Cycle {cycle_index} 类型:", cycle['type'][0])
-    print(f"Cycle {cycle_index} 环境温度:", cycle['ambient_temperature'])
-    print(f"Cycle {cycle_index} 时间长度:", cycle['time'].shape)
+    
+    # 环境温度格式调整，避免[[24]]这种多维嵌套
+    ambient_temp = cycle['ambient_temperature']
+    if isinstance(ambient_temp, np.ndarray):
+        ambient_temp = ambient_temp.flatten()
+        if ambient_temp.size == 1:
+            ambient_temp = ambient_temp[0]
+    print(f"Cycle {cycle_index} 环境温度:", ambient_temp)
 
-    if not visualize:
-        return total_cycles
+    # 时间长度，展示维度和内容
+    print(f"Cycle {cycle_index} time 形状:", cycle['time'].shape)
+    print(f"Cycle {cycle_index} time 内容:", cycle['time'].flatten())
 
-    # 访问 data 字段，可能有多层嵌套
+    # 读取 data
     data = cycle['data']
     data = data[0, 0] if len(data.shape) > 1 else data[0]
 
+    # 提取6个字段
+    V = data['Voltage_measured'].flatten()
+    I = data['Current_measured'].flatten()
+    T = data['Temperature_measured'].flatten()
+    I_chg = data['Current_charge'].flatten()
+    V_chg = data['Voltage_charge'].flatten()
     time = data['Time'].flatten()
 
-    # 可能有字段不存在，安全访问
-    fields_to_plot = ['Voltage_measured', 'Current_measured', 'Temperature_measured', 'Current_charge', 'Voltage_charge']
-    available_fields = [f for f in fields_to_plot if f in data.dtype.names]
+    # 打印前10条数据（保证一定打印）
+    combined = np.stack([V, I, T, I_chg, V_chg, time], axis=1)
+    print(f"\nCycle {cycle_index} 数据前 10 行 (Voltage, Current, Temperature, Current_charge, Voltage_charge, Time):")
+    print(combined[:10])
 
-    plt.figure(figsize=(12, 3 * len(available_fields)))
-    for i, field in enumerate(available_fields, 1):
-        plt.subplot(len(available_fields), 1, i)
-        plt.plot(time, data[field].flatten())
-        plt.title(f'{field} vs Time (Cycle {cycle_index})')
-        plt.xlabel('Time (min)')
-        plt.grid(True)
-    plt.tight_layout()
-    plt.show()
+    # 是否绘图
+    if visualize:
+        fields_to_plot = [
+            ('Voltage_measured', V),
+            ('Current_measured', I),
+            ('Temperature_measured', T),
+            ('Current_charge', I_chg),
+            ('Voltage_charge', V_chg)
+        ]
 
+        plt.figure(figsize=(12, 10))
+        for i, (label, series) in enumerate(fields_to_plot, 1):
+            plt.subplot(len(fields_to_plot), 1, i)
+            plt.plot(time, series)
+            plt.title(f'{label} vs Time (Cycle {cycle_index})')
+            plt.xlabel('Time (min)')
+            plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+    print(data['Time'].flatten())
     return total_cycles
-
-
-
-
