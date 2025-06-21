@@ -32,6 +32,12 @@ paperswithcode.com
 3. 锂电池放电完成后极化电压消除，电压回升 温度回降
 ![放电恢复](image/锂电池放电完成后极化电压消除，电压回升%20温度回降.png)
 
+## __main__.py 文件架构 
+batch_convert_mat_to_csv（）实现.mat 到 .csv的转换，假如Delta time 和 SOC 的伪真值
+clean_soc_csv_file （） 清洗NAN和去掉SOC不合理的值
+plot_voltage_soc_by_cycle() 可视化观察不同工况的V I SOC with respect to time
+
+
 
 ## 环境依赖
 请使用以下命令安装依赖：
