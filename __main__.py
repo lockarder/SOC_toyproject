@@ -9,6 +9,10 @@ from utils import clean_soc_csv_files
 from utils import load_all_clean_csvs
 from utils import plot_variable_curve
 from sklearn.preprocessing import StandardScaler
+from torch.utils.data import Dataset
+from dataset import BatteryDatasetLSTM
+import joblib
+
 
 
 mat_dir = r"data/raw/batterydata"
@@ -52,6 +56,10 @@ feature_cols = ['Delta_t', 'Voltage', 'Current', 'Temperature']
 
 scaler = StandardScaler()
 scaler.fit(train_df[feature_cols])  # 只用训练集
+joblib.dump(scaler, 'scaler.save')
+
+# 推理时加载 scaler
+scaler = joblib.load('scaler.save')
 
 train_features_scaled = scaler.transform(train_df[feature_cols])
 val_features_scaled = scaler.transform(val_df[feature_cols])
