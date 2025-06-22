@@ -119,3 +119,39 @@ def plot_voltage_soc_by_cycle(csv_path):
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
+
+
+import matplotlib.pyplot as plt
+
+def plot_variable_curve(df, variable, source_file=None, cycle_index=None):
+    """
+    绘制指定变量随累计时间变化的曲线。
+    
+    参数：
+    - df: DataFrame，包含数据，必须有 'Delta_t' 列
+    - variable: str，要绘制的变量名
+    - source_file: str，筛选指定文件（可选）
+    - cycle_index: int，筛选指定周期（可选）
+    """
+    plot_df = df.copy()
+    if source_file is not None:
+        plot_df = plot_df[plot_df['SourceFile'] == source_file]
+    if cycle_index is not None:
+        plot_df = plot_df[plot_df['Cycle_Index'] == cycle_index]
+
+    if plot_df.empty:
+        print("指定条件下无数据，无法绘图")
+        return
+
+    # 计算累计时间
+    plot_df = plot_df.sort_values('Delta_t').copy()
+    plot_df['CumTime'] = plot_df['Delta_t'].cumsum()
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(plot_df['CumTime'], plot_df[variable], marker='.', linestyle='-')
+    plt.title(f"{variable} 随累计时间变化曲线\n文件: {source_file if source_file else '全部'} 周期: {cycle_index if cycle_index is not None else '全部'}")
+    plt.xlabel('累计时间 (s)')
+    plt.ylabel(variable)
+    plt.grid(True)
+    plt.show()
+
