@@ -10,11 +10,13 @@ from utils import load_all_clean_csvs
 from utils import plot_variable_curve
 from sklearn.preprocessing import StandardScaler
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 from dataset import BatteryDatasetLSTM
 import joblib
+from mymodel import BasicLSTM
 
 
-
+#step 1: 数据准备
 mat_dir = r"data/raw/batterydata"
 csv_dir = r"data/processed"
 
@@ -65,4 +67,8 @@ train_features_scaled = scaler.transform(train_df[feature_cols])
 val_features_scaled = scaler.transform(val_df[feature_cols])
 test_features_scaled = scaler.transform(test_df[feature_cols])
 
+
+
+
+#step 2：模型定义 
 
