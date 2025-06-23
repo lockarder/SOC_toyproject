@@ -2,7 +2,7 @@
 Author: Shiang Guo gshiang@zju.edu.cn
 ## 项目简介
 这是一个电池状态（SOC）估计的深度学习示范项目，包含数据处理、模型训练和评估代码。
-
+所有时序序列考虑非均匀间隔数据采样，并且不适用线性插值，选择时间增量Δt作为额外输入特征，避免绝对时间编码在长时预测中的梯度消失
 ## 项目结构
 - `data/`：存放数据文件
 - `notebooks/`：交互式分析笔记本
@@ -42,7 +42,7 @@ paperswithcode.com
 
 ## 运行指南 
 考虑四种模型 LSTM 1D-CNN LSTM+1D-CNN Transformer
-LSTM ： class BasicLSTM(nn.Module)
+LSTM： class BasicLSTM(nn.Module)
 
 
 
