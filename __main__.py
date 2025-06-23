@@ -68,7 +68,14 @@ val_features_scaled = scaler.transform(val_df[feature_cols])
 test_features_scaled = scaler.transform(test_df[feature_cols])
 
 
-
-
 #step 2：模型定义 
+input_size = 4
+hidden_size = 64
+num_layers = 2
+dropout = 0.2
 
+model = BasicLSTM(input_size=input_size,
+                  hidden_size=hidden_size,
+                  num_layers=num_layers,
+                  dropout=dropout)
+#step 3: 训练设置。
