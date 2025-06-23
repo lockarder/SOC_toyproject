@@ -10,6 +10,7 @@ import torch.optim as optim
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from dataset import BatteryDatasetLSTM
+import optuna
 
 # ==== 配置参数 ====
 mat_dir = os.path.join("data", "raw", "batterydata")
