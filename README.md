@@ -40,6 +40,12 @@ paperswithcode.com
 3. 锂电池放电完成后极化电压消除，电压回升 温度回降
 ![放电恢复](image/锂电池放电完成后极化电压消除，电压回升%20温度回降.png)
 
+## 运行指南 
+考虑四种模型 LSTM 1D-CNN LSTM+1D-CNN Transformer
+LSTM ： class BasicLSTM(nn.Module)
+
+
+
 ## __main__.py 文件架构 
         Step 1: 原始数据加载
                 ↓
