@@ -115,6 +115,12 @@ Best Params: {'hidden_size': 75, 'num_layers': 2, 'dropout': 0.08703576427525062
 Test Loss: 0.000618
 Final training complete.
 
+## 1DCNN 结果
+最优参数：
+Best Params: {'num_filters': 64, 'kernel_size': 7, 'num_layers': 2, 'stride': 3, 'dropout': 0.4966608032430354, 'pool_type': 'avg', 'lr': 0.00033782157845375167, 'batch_size': 128}
+Test Loss: 0.001815
+损失曲线：
+![1DCNN](image/1DCNN_loss.png)
 
 ## 环境依赖
 请使用以下命令安装依赖：
