@@ -85,3 +85,68 @@ class Basic1DCNN(nn.Module):
         x = x.squeeze(-1)                 # → (batch, num_filters)
         x = self.fc(x)                    # → (batch, 1)
         return x
+    
+class BasicCNNLSTMParallel(nn.Module):
+    def __init__(
+        self,
+        input_size: int,
+        cnn_params: dict,
+        lstm_params: dict,
+        fc_hidden_size: int = 64,
+        dropout: float = 0.3
+    ):
+        """
+        并行 CNN + LSTM 特征融合模型，用于 SOC 估计等时序回归任务
+
+        参数：
+            input_size (int): 每个时间步的特征维度
+            cnn_params (dict): 包含CNN的超参数（num_filters, kernel_size等）
+            lstm_params (dict): 包含LSTM的超参数（hidden_size, num_layers等）
+            fc_hidden_size (int): 融合后全连接隐藏层维度
+            dropout (float): 融合层 dropout 概率
+        """
+        super(BasicCNNLSTMParallel, self).__init__()
+
+        # CNN 分支
+        self.cnn_branch = Basic1DCNN(
+            input_size=input_size,
+            num_filters=cnn_params.get("num_filters", 64),
+            kernel_size=cnn_params.get("kernel_size", 3),
+            num_layers=cnn_params.get("num_layers", 2),
+            stride=cnn_params.get("stride", 1),
+            pool_type=cnn_params.get("pool_type", "avg"),
+            dropout=cnn_params.get("dropout", 0.2)
+        )
+
+        # LSTM 分支
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=lstm_params.get("hidden_size", 64),
+            num_layers=lstm_params.get("num_layers", 2),
+            batch_first=True,
+            dropout=lstm_params.get("dropout", 0.0) if lstm_params.get("num_layers", 2) > 1 else 0.0
+        )
+        self.lstm_hidden_size = lstm_params.get("hidden_size", 64)
+
+        # 融合后回归头
+        self.regressor = nn.Sequential(
+            nn.Linear(cnn_params.get("num_filters", 64) + self.lstm_hidden_size, fc_hidden_size),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(fc_hidden_size, 1)
+        )
+
+    def forward(self, x):
+        # 输入 x: (batch, seq_len, input_size)
+        x_cnn = x.permute(0, 2, 1)                          # CNN 输入: (batch, input_size, seq_len)
+        cnn_feat = self.cnn_branch.conv_stack(x_cnn)        # → (batch, num_filters, new_seq_len)
+        cnn_feat = self.cnn_branch.pool(cnn_feat).squeeze(-1)  # → (batch, num_filters)
+
+        # LSTM 分支输出（取最后一层的最后时间步）
+        _, (h_n, _) = self.lstm(x)                          # h_n: (num_layers, batch, hidden_size)
+        lstm_feat = h_n[-1]                                 # → (batch, hidden_size)
+
+        # 特征融合
+        combined = torch.cat([cnn_feat, lstm_feat], dim=1)  # → (batch, num_filters + hidden_size)
+        out = self.regressor(combined)                      # → (batch, 1)
+        return out

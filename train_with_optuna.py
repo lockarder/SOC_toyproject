@@ -62,6 +62,11 @@ train_df_scaled = replace_features_in_df(train_df, train_features_scaled, featur
 val_df_scaled = replace_features_in_df(val_df, val_features_scaled, feature_cols)
 test_df_scaled = replace_features_in_df(test_df, test_features_scaled, feature_cols)
 
+
+# ===== 数据处理完成，更换模型要后面修改
+
+
+
 # ==== 固定参数 ====
 input_size = len(feature_cols)
 sequence_length = 20

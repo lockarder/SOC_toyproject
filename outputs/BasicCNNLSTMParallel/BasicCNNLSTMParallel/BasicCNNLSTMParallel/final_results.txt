@@ -1,0 +1,2 @@
+Best Params: {'num_filters': 64, 'kernel_size': 7, 'cnn_num_layers': 3, 'stride': 2, 'pool_type': 'max', 'cnn_dropout': 0.12126344812734963, 'hidden_size': 32, 'lstm_num_layers': 1, 'lstm_dropout': 0.2518875509163455, 'lr': 0.003997189196445162, 'batch_size': 128, 'fc_hidden_size': 64, 'fusion_dropout': 0.06862408884104365}
+Test Loss: 0.000716

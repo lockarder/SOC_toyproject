@@ -1,1 +1,1 @@
-from .model import BasicLSTM, Basic1DCNN
+from .model import BasicLSTM, Basic1DCNN, BasicCNNLSTMParallel
