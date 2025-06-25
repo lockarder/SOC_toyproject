@@ -109,12 +109,13 @@ Epoch 3/10, Train Loss: 0.001577, Val Loss: 0.001555
 Epoch 4/10, Train Loss: 0.001451, Val Loss: 0.001343
 Epoch 5/10, Train Loss: 0.001359, Val Loss: 0.001377
 Epoch 6/10, Train Loss: 0.001279, Val Loss: 0.001275
-## optuna调试的结果_LSTM
+## LSTM 结果
 最优参数：
 Best Params: {'hidden_size': 75, 'num_layers': 2, 'dropout': 0.08703576427525062, 'lr': 0.001830995342196746, 'batch_size': 64}
 Test Loss: 0.000618
 Final training complete.
-
+损失曲线：
+![LSTM](image/LSTM_loss.png)
 ## 1DCNN 结果
 最优参数：
 Best Params: {'num_filters': 64, 'kernel_size': 7, 'num_layers': 2, 'stride': 3, 'dropout': 0.4966608032430354, 'pool_type': 'avg', 'lr': 0.00033782157845375167, 'batch_size': 128}
